@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}Macuin Refaccionaria{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<!-- ═══ NAVBAR ═══════════════════════════════════════════════ -->
+<nav class="navbar">
+  <a href="{{ url_for('catalogo') }}" class="navbar-logo">
+    <div class="logo-box">
+      <span class="logo-text">MACUIN</span>
+      <span class="logo-sub">REFACCIONARIA</span>
+    </div>
+  </a>
+
+  <ul class="navbar-links">
+    <li><a href="#">Inicio</a></li>
+    <li><a href="#">Servicios</a></li>
+    <li><a href="#">Sucursales</a></li>
+    <li><a href="#">Ofertas</a></li>
+    <li><a href="#">Contacto</a></li>
+  </ul>
+
+  <div class="navbar-actions">
+    <a href="{{ url_for('carrito') }}" class="nav-icon" title="Carrito">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      {% set carrito_count = session.get('carrito', [])|length %}
+      {% if carrito_count > 0 %}
+        <span class="cart-badge">{{ carrito_count }}</span>
+      {% endif %}
+    </a>
+    {% if session.get('usuario') %}
+      <a href="{{ url_for('historial') }}" class="nav-icon" title="Mi cuenta">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </a>
+    {% else %}
+      <a href="{{ url_for('login') }}" class="nav-icon" title="Iniciar Sesión">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </a>
+    {% endif %}
+  </div>
+</nav>
+
+<!-- ═══ CONTENIDO ════════════════════════════════════════════ -->
+<main class="main-content">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  {% block content %}{% endblock %}
+</main>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

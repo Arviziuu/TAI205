@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}Carrito de Compras – Macuin{% endblock %}
+
+{% block content %}
+<div class="layout-with-sidebar">
+
+  <!-- ── SIDEBAR (mismo que catálogo) ── -->
+  <aside class="sidebar">
+    <div class="sidebar-toggle"><span>☰</span> <small>▼</small></div>
+    <div class="sidebar-section">
+      <h3 class="sidebar-heading">Categorias</h3>
+      <ul class="category-list">
+        <li><a href="{{ url_for('catalogo', categoria='Refacciones') }}">› Refacciones</a></li>
+        <li><a href="{{ url_for('catalogo', categoria='Interiores') }}">› Interiores</a></li>
+        <li><a href="{{ url_for('catalogo', categoria='Exteriores') }}">› Exteriores</a></li>
+        <li><a href="{{ url_for('catalogo', categoria='Productos') }}">› Productos</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <h3 class="sidebar-heading">Precio</h3>
+      <div class="price-range">
+        <input type="range" min="200" max="10000" value="10000" disabled>
+        <div class="price-labels"><span>Min: $200</span><span>Max: $10,000</span></div>
+      </div>
+      <h3 class="sidebar-heading" style="margin-top:1.2rem">Marca</h3>
+      <div class="brand-list">
+        {% for marca in ['Chevrolet','Nissan','Ford','Honda','Jeep'] %}
+        <label class="checkbox-label"><input type="checkbox"> {{ marca }}</label>
+        {% endfor %}
+      </div>
+      <a href="{{ url_for('catalogo') }}" class="btn-filter" style="display:block;text-align:center;text-decoration:none">Aplicar Filtros</a>
+    </div>
+  </aside>
+
+  <!-- ── CONTENIDO ── -->
+  <section class="catalog-main">
+    <div class="catalog-header">
+      <h1 class="catalog-title">Carrito de Compras</h1>
+      <div class="search-box">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Buscar Autopartes...">
+      </div>
+    </div>
+
+    {% if carrito %}
+      <p class="saved-msg">Pedido guardado.</p>
+
+      <div class="cart-layout">
+        <div class="cart-items">
+          <!-- Encabezado tabla -->
+          <div class="cart-table-head">
+            <span>Producto</span>
+            <span>Precio</span>
+            <span>Cantidad</span>
+            <span>Subtotal</span>
+          </div>
+
+          {% for item in carrito %}
+          <div class="cart-row">
+            <div class="cart-product">
+              <img src="{{ url_for('static', filename='img/' + item.imagen) }}" alt="{{ item.nombre }}"
+                   onerror="this.src='https://placehold.co/70x60/f0f0f0/999?text=IMG'">
+              <span class="cart-name">{{ item.nombre }}</span>
+            </div>
+            <span class="cart-price">${{ "{:,}".format(item.precio) }}</span>
+            <div class="qty-control">
+              <form method="POST" action="{{ url_for('actualizar_carrito', producto_id=item.id) }}" style="display:inline">
+                <input type="hidden" name="accion" value="disminuir">
+                <button type="submit" class="qty-btn">−</button>
+              </form>
+              <span class="qty-num">{{ item.cantidad }}</span>
+              <form method="POST" action="{{ url_for('actualizar_carrito', producto_id=item.id) }}" style="display:inline">
+                <input type="hidden" name="accion" value="aumentar">
+                <button type="submit" class="qty-btn">+</button>
+              </form>
+            </div>
+            <span class="cart-subtotal">${{ "{:,}".format(item.precio * item.cantidad) }}</span>
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- Resumen -->
+        <div class="order-summary">
+          <h3 class="summary-title">Resumen del Pedido</h3>
+          <div class="summary-row">
+            <span>Subtotal</span>
+            <span>${{ "{:,}".format(subtotal) }}</span>
+          </div>
+          <div class="summary-row summary-total">
+            <span>Total <small>(Iva incluido)</small></span>
+            <span>${{ "{:,}".format(subtotal) }}</span>
+          </div>
+          <button class="btn-checkout">Finalizar Compra</button>
+        </div>
+      </div>
+
+      <div class="ver-mas-wrap" style="justify-content:flex-start;padding-top:1rem">
+        <a href="{{ url_for('catalogo') }}" class="btn-ver-mas">Seguir Comprando</a>
+      </div>
+
+    {% else %}
+      <div class="empty-cart">
+        <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        <p>Tu carrito está vacío</p>
+        <a href="{{ url_for('catalogo') }}" class="btn-primary">Ver Catálogo</a>
+      </div>
+    {% endif %}
+
+    <div class="ver-mas-wrap">
+      <button class="btn-ver-mas" style="visibility:hidden">Ver Mas</button>
+    </div>
+  </section>
+
+</div>
+{% endblock %}

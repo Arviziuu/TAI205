@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}Historial de Pedidos – Macuin{% endblock %}
+
+{% block content %}
+<div class="layout-with-sidebar">
+
+  <aside class="sidebar">
+    <div class="sidebar-toggle"><span>☰</span> <small>▼</small></div>
+    <div class="sidebar-section">
+      <h3 class="sidebar-heading">Categorias</h3>
+      <ul class="category-list">
+        <li><a href="{{ url_for('catalogo', categoria='Refacciones') }}">› Refacciones</a></li>
+        <li><a href="{{ url_for('catalogo', categoria='Interiores') }}">› Interiores</a></li>
+        <li><a href="{{ url_for('catalogo', categoria='Exteriores') }}">› Exteriores</a></li>
+        <li><a href="{{ url_for('catalogo', categoria='Productos') }}">› Productos</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <h3 class="sidebar-heading">Precio</h3>
+      <div class="price-range">
+        <input type="range" min="200" max="10000" value="10000" disabled>
+        <div class="price-labels"><span>Min: $200</span><span>Max: $10,000</span></div>
+      </div>
+      <h3 class="sidebar-heading" style="margin-top:1.2rem">Marca</h3>
+      <div class="brand-list">
+        {% for marca in ['Chevrolet','Nissan','Ford','Honda','Jeep'] %}
+        <label class="checkbox-label"><input type="checkbox"> {{ marca }}</label>
+        {% endfor %}
+      </div>
+      <a href="{{ url_for('catalogo') }}" class="btn-filter" style="display:block;text-align:center;text-decoration:none">Aplicar Filtros</a>
+    </div>
+  </aside>
+
+  <section class="catalog-main">
+    <div class="catalog-header">
+      <div>
+        <h1 class="catalog-title">Historial de Pedidos</h1>
+        <nav class="breadcrumb">Inicio / Mi Historial de Pedidos</nav>
+      </div>
+      <div class="search-box">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Buscar Autopartes...">
+      </div>
+    </div>
+
+    <!-- Buscador de pedidos -->
+    <form method="GET" class="pedido-search-wrap">
+      <div class="search-box pedido-search">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" name="q" placeholder="Buscar Pedido" value="{{ request.args.get('q','') }}">
+      </div>
+    </form>
+
+    <!-- Filtros de estatus -->
+    <div class="status-filters">
+      {% for f in ['Todos', 'Pendiente', 'Enviado', 'Completado'] %}
+      <a href="{{ url_for('historial', filtro=f) }}"
+         class="status-tab {% if filtro == f %}active{% endif %}">{{ f }}</a>
+      {% endfor %}
+    </div>
+
+    <!-- Tabla de pedidos -->
+    <div class="orders-table">
+      <div class="orders-head">
+        <span>No. Pedido</span>
+        <span>Fecha</span>
+        <span>Total</span>
+        <span>Estatus</span>
+        <span>Acciones</span>
+      </div>
+
+      {% for pedido in pedidos %}
+      <div class="order-row">
+        <span class="order-id">#{{ pedido.id }}</span>
+        <span>{{ pedido.fecha }}</span>
+        <span>${{ "{:,}".format(pedido.total) }}</span>
+        <span>
+          <span class="badge badge-{{ pedido.estatus | lower }}">{{ pedido.estatus }}</span>
+        </span>
+        <span>
+          <a href="{{ url_for('detalle_pedido', pedido_id=pedido.id) }}" class="link-detalles">Detalles</a>
+        </span>
+      </div>
+      {% else %}
+        <p style="padding:1.5rem;color:#999">No hay pedidos.</p>
+      {% endfor %}
+    </div>
+
+    <div class="ver-mas-wrap" style="justify-content:flex-start;padding-top:1rem">
+      <a href="{{ url_for('catalogo') }}" class="btn-ver-mas">Seguir Comprando</a>
+    </div>
+    <div class="ver-mas-wrap"><button class="btn-ver-mas" style="visibility:hidden">Ver Mas</button></div>
+  </section>
+
+</div>
+{% endblock %}

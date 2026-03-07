@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% block title %}Detalle del Pedido #{{ pedido.id }} – Macuin{% endblock %}
+
+{% block content %}
+<div class="layout-with-sidebar">
+
+  <aside class="sidebar">
+    <div class="sidebar-toggle"><span>☰</span> <small>▼</small></div>
+    <div class="sidebar-section">
+      <h3 class="sidebar-heading">Categorias</h3>
+      <ul class="category-list">
+        <li><a href="{{ url_for('catalogo', categoria='Refacciones') }}">› Refacciones</a></li>
+        <li><a href="{{ url_for('catalogo', categoria='Interiores') }}">› Interiores</a></li>
+        <li><a href="{{ url_for('catalogo', categoria='Exteriores') }}">› Exteriores</a></li>
+        <li><a href="{{ url_for('catalogo', categoria='Productos') }}">› Productos</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <h3 class="sidebar-heading">Precio</h3>
+      <div class="price-range">
+        <input type="range" min="200" max="10000" value="10000" disabled>
+        <div class="price-labels"><span>Min: $200</span><span>Max: $10,000</span></div>
+      </div>
+      <h3 class="sidebar-heading" style="margin-top:1.2rem">Marca</h3>
+      <div class="brand-list">
+        {% for marca in ['Chevrolet','Nissan','Ford','Honda','Jeep'] %}
+        <label class="checkbox-label"><input type="checkbox"> {{ marca }}</label>
+        {% endfor %}
+      </div>
+      <a href="{{ url_for('catalogo') }}" class="btn-filter" style="display:block;text-align:center;text-decoration:none">Aplicar Filtros</a>
+    </div>
+  </aside>
+
+  <section class="catalog-main">
+    <div class="catalog-header">
+      <div>
+        <h1 class="catalog-title">Detalle del Pedido #{{ pedido.id }}</h1>
+        <nav class="breadcrumb">Inicio / Mi Historial de Pedidos / Detalle del pedido</nav>
+      </div>
+      <div class="search-box">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Buscar Autopartes...">
+      </div>
+    </div>
+
+    <div class="detail-layout">
+
+      <!-- Columna izquierda -->
+      <div class="detail-left">
+        <!-- Resumen de pedido -->
+        <div class="order-detail-card">
+          <div class="order-detail-top">
+            <span class="order-detail-id">#{{ pedido.id }}</span>
+            <span class="badge badge-{{ pedido.estatus | lower }}">{{ pedido.estatus }}</span>
+          </div>
+          <div class="order-detail-meta">
+            <span><strong>Fecha</strong> {{ pedido.fecha }}</span>
+            <span><strong>Total</strong> ${{ "{:,}".format(pedido.total) }}</span>
+          </div>
+          <div class="order-timeline-mini">
+            <p>• 24 de abril · Pago recibido (pendiente)</p>
+            <p>• 24 de abril · Pedido enviado</p>
+          </div>
+        </div>
+
+        <!-- Items del pedido -->
+        <div class="cart-table-head" style="margin-top:1rem">
+          <span>Producto</span>
+          <span>Precio</span>
+          <span>Cantidad</span>
+          <span>Subtotal</span>
+        </div>
+
+        {% for item in pedido.items %}
+        <div class="cart-row">
+          <div class="cart-product">
+            <img src="{{ url_for('static', filename='img/' + item.get('imagen','placeholder.png')) }}" alt="{{ item.nombre }}"
+                 onerror="this.src='https://placehold.co/70x60/f0f0f0/999?text=IMG'">
+            <span class="cart-name">{{ item.nombre }}</span>
+          </div>
+          <span class="cart-price">${{ "{:,}".format(item.precio) }}</span>
+          <div class="qty-control">
+            <button class="qty-btn" disabled>−</button>
+            <span class="qty-num">{{ item.cantidad }}</span>
+            <button class="qty-btn" disabled>+</button>
+          </div>
+          <span class="cart-subtotal">${{ "{:,}".format(item.subtotal) }}</span>
+        </div>
+        {% endfor %}
+
+        <div style="padding-top:1rem">
+          <a href="{{ url_for('historial') }}" class="btn-ver-mas">Seguir Comprando</a>
+        </div>
+      </div>
+
+      <!-- Columna derecha -->
+      <div class="detail-right">
+        <div class="info-card">
+          <h4 class="info-card-title">Historial del pedido</h4>
+          <ul class="timeline">
+            <li>24 de abril · Pago recibido (pendiente)</li>
+            <li>24 de abril · Pedido enviado</li>
+            <li>Producto recibido en paquetería</li>
+          </ul>
+        </div>
+
+        <div class="info-card">
+          <h4 class="info-card-title">Informacion de Envio</h4>
+          <ul class="info-list">
+            <li>Juan Perez</li>
+            <li>1234 Calle Ramiro Díaz</li>
+            <li>Ciudad de Queretaro CP 12304</li>
+          </ul>
+        </div>
+
+        <div class="info-card">
+          <h4 class="info-card-title">Metodo de Pago</h4>
+          <ul class="info-list">
+            <li>Tarjeta de Credito *1547</li>
+          </ul>
+        </div>
+
+        <a href="{{ url_for('historial') }}" class="btn-checkout" style="display:block;text-align:center;text-decoration:none;margin-top:1rem">
+          Regresar al historial
+        </a>
+      </div>
+
+    </div>
+
+    <div class="ver-mas-wrap"><button class="btn-ver-mas" style="visibility:hidden">.</button></div>
+  </section>
+
+</div>
+{% endblock %}

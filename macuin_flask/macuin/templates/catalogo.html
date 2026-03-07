@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}Catálogo – Macuin{% endblock %}
+
+{% block content %}
+<div class="layout-with-sidebar">
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar">
+    <div class="sidebar-toggle">
+      <span>☰</span> <small>▼</small>
+    </div>
+
+    <div class="sidebar-section">
+      <h3 class="sidebar-heading">Categorias</h3>
+      <ul class="category-list">
+        <li><a href="{{ url_for('catalogo', categoria='Refacciones') }}" class="{% if request.args.get('categoria') == 'Refacciones' %}active{% endif %}">› Refacciones</a></li>
+        <li><a href="{{ url_for('catalogo', categoria='Interiores') }}" class="{% if request.args.get('categoria') == 'Interiores' %}active{% endif %}">› Interiores</a></li>
+        <li><a href="{{ url_for('catalogo', categoria='Exteriores') }}" class="{% if request.args.get('categoria') == 'Exteriores' %}active{% endif %}">› Exteriores</a></li>
+        <li><a href="{{ url_for('catalogo', categoria='Productos') }}" class="{% if request.args.get('categoria') == 'Productos' %}active{% endif %}">› Productos</a></li>
+      </ul>
+    </div>
+
+    <div class="sidebar-section">
+      <h3 class="sidebar-heading">Precio</h3>
+      <form method="GET" id="filter-form">
+        <input type="hidden" name="categoria" value="{{ request.args.get('categoria', '') }}">
+        <div class="price-range">
+          <input type="range" name="precio_max" min="200" max="10000" value="{{ request.args.get('precio_max', 10000) }}" oninput="document.getElementById('max-val').textContent = '$'+this.value">
+          <div class="price-labels">
+            <span>Min: $200</span>
+            <span>Max: <span id="max-val">${{ request.args.get('precio_max', '10,000') }}</span></span>
+          </div>
+        </div>
+
+        <h3 class="sidebar-heading" style="margin-top:1.2rem">Marca</h3>
+        <div class="brand-list">
+          {% for marca in ['Chevrolet', 'Nissan', 'Ford', 'Honda', 'Jeep'] %}
+          <label class="checkbox-label">
+            <input type="checkbox" name="marca" value="{{ marca }}"
+              {% if marca in request.args.getlist('marca') %}checked{% endif %}> {{ marca }}
+          </label>
+          {% endfor %}
+        </div>
+
+        <button type="submit" class="btn-filter">Aplicar Filtros</button>
+      </form>
+    </div>
+  </aside>
+
+  <!-- ── CONTENIDO PRINCIPAL ── -->
+  <section class="catalog-main">
+    <div class="catalog-header">
+      <h1 class="catalog-title">Catalogo de Autopartes / Productos</h1>
+      <div class="catalog-toolbar">
+        <span class="sort-label">Ordenar por <strong>Mas Vendidos ▾</strong></span>
+        <form method="GET" class="search-form">
+          <input type="hidden" name="categoria" value="{{ request.args.get('categoria', '') }}">
+          <div class="search-box">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" name="q" placeholder="Buscar Autopartes..." value="{{ busqueda }}">
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="product-grid">
+      {% for producto in productos %}
+      <div class="product-card">
+        <div class="product-img-wrap">
+          <img src="{{ url_for('static', filename='img/' + producto.imagen) }}" alt="{{ producto.nombre }}" onerror="this.src='https://placehold.co/200x160/f0f0f0/999?text=Producto'">
+        </div>
+        <div class="product-info">
+          <p class="product-name">{{ producto.nombre }}</p>
+          <div class="product-footer">
+            <span class="product-price">${{ "{:,}".format(producto.precio) }}</span>
+            <form method="POST" action="{{ url_for('agregar_carrito', producto_id=producto.id) }}">
+              <button type="submit" class="btn-cart">Agregar al Carrito</button>
+            </form>
+          </div>
+        </div>
+      </div>
+      {% else %}
+        <p class="no-results">No se encontraron productos.</p>
+      {% endfor %}
+    </div>
+
+    <div class="ver-mas-wrap">
+      <button class="btn-ver-mas">Ver Mas</button>
+    </div>
+  </section>
+
+</div>
+{% endblock %}
