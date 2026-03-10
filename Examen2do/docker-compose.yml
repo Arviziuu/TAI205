@@ -1,8 +1,8 @@
 services:
   api:
     build: .
-    container_name: Repaso_FastAPI
+    container_name: Examen2do
     ports:
-      - "8000:8000"
+      - "5000:5000"
     volumes:
       - ./app:/app/app
