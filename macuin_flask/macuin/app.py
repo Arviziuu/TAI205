@@ -141,5 +141,13 @@ def detalle_pedido(pedido_id):
         return redirect(url_for('historial'))
     return render_template('detalle_pedido.html', pedido=pedido)
 
+@app.route('/empleados')
+def lista_empleados():
+    lista = [
+        {'id': 1, 'nombre': 'Juan Pérez', 'username': 'jperez', 'rol': 'Administrador', 'activo': True},
+        {'id': 2, 'nombre': 'Ana García', 'username': 'agarcia', 'rol': 'Vendedor', 'activo': False}
+    ]
+    return render_template('empleados.html', empleados=lista)
+
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=8000, debug=True)
